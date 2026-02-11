@@ -91,3 +91,59 @@ df_clean["location"] = df_clean["location"].str.title()
 print("Info Final : ", df_clean.info())
 # contoh data bersih
 print(df_clean.head(13))
+
+# pembersihan lanjutan
+# cek value distinct pada kolom item, payment_method, location
+cols_to_check = ["item", "payment_method", "location"]
+for col in cols_to_check:
+    print(f"\n--- NILAI UNIK DI KOLOM: {col.upper()} ---")
+    # Kita pakai value_counts() agar terlihat juga jumlah datanya
+    # dropna=False agar kalau ada NaN yang tersisa, dia muncul
+    print(df_clean[col].value_counts(dropna=False))
+    print("-" * 15)
+
+# Mengganti semua label error menjadi unknown
+cols_to_fix = ["item", "payment_method", "location"]
+for cols in cols_to_fix:
+    df_clean[cols] = df_clean[cols].replace(
+        ["Error", "ERROR", "Unknown", "unknown"], "Unknown"
+    )
+
+# Cek ulang value distinct setelah pembersihan lanjutan
+for col in cols_to_check:
+    print(
+        f"\n--- NILAI UNIK DI KOLOM: {col.upper()} (SETELAH PEMBERSIHAN LANJUTAN) ---"
+    )
+    print(df_clean[col].value_counts(dropna=False))
+    print("-" * 15)
+
+# Validasi logika matematika ( Math check)
+# hitung ulang total seharusnya
+df_clean["calculated_total"] = df_clean["quantity"] * df_clean["price_per_unit"]
+
+# Cari selisih (toleransi o.01)
+mask_salah_hitung = abs(df_clean["total_spent"] - df_clean["calculated_total"]) > 0.01
+jumlah_salah = mask_salah_hitung.sum()
+print(f"Jumlah transaksi dengan hitungan salah: {jumlah_salah}")
+
+print(df_clean.head(50))
+
+# Final Check
+# apus kolom bantuan 'calculated_total' (karena isinya sama persis dengan total_spent)
+if "calculated_total" in df_clean.columns:
+    df_clean = df_clean.drop(columns=["calculated_total"])
+
+# Cek insight sederhana
+# memastikan angka masuk akal
+print("--- TOTAL PENDAPATAN (REVENUE) ---")
+print(f"${df_clean['total_spent'].sum():,.2f}")
+
+print("\n--- TOP 5 ITEM TERLARIS (Quantity) ---")
+print(df_clean.groupby("item")["quantity"].sum().sort_values(ascending=False).head(5))
+
+print("\n--- RATA-RATA TRANSAKSI PER METODE BAYAR ---")
+print(df_clean.groupby("payment_method")["total_spent"].mean())
+
+# XPORT KE CSV BARU
+df_clean.to_csv("cafe_sales_clean.csv", index=False)
+print("\n✅ File 'cafe_sales_clean.csv' berhasil disimpan!")
