@@ -1,7 +1,6 @@
 # ☕ Cafe Sales Analytics: From Dirty Data to Actionable Insights
 
 ![Dashboard Preview](assets/dashboard_final.png)
-*(Pastikan Anda mengupload screenshot dashboard ke folder 'assets' dan sesuaikan nama filenya)*
 
 ## 📌 Project Overview
 Project ini bertujuan untuk mengubah data transaksi kafe yang kotor dan tidak terstruktur menjadi **dashboard interaktif** yang memberikan wawasan strategis bagi pemilik bisnis. 
@@ -78,4 +77,3 @@ Berdasarkan analisis visual dari dashboard final, berikut adalah rangkuman kiner
 3.  **Operational Audit:** Segera lakukan audit teknis pada mesin kasir (POS) dan berikan pelatihan ulang kepada staf untuk meminimalisir input data pembayaran "Unknown".
 
 ---
-*Connect with me on LinkedIn to discuss more about Data Analysis!*
