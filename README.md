@@ -14,31 +14,6 @@ Saya mensimulasikan peran sebagai **Data Analyst** yang bertanggung jawab atas p
 
 ---
 
-## 📊 Executive Summary (Dashboard Insights)
-
-Berdasarkan analisis visual dari dashboard final, berikut adalah kinerja bisnis secara keseluruhan:
-
-### 1. Key Performance Indicators (KPIs)
-* **Total Revenue:** **$73,000** (Omzet Total)
-* **Total Transactions:** **8,159** (Jumlah Struk)
-* **Average Order Value (AOV):** **$8.9** (Rata-rata belanja per orang)
-
-### 2. Tren Penjualan & Musiman
-* **Volatilitas Bulanan:** Penjualan bergerak fluktuatif antara **$5.7K - $6.4K**.
-* **Peak Performance:** Bulan **Juni ($6.4K)** mencatat penjualan tertinggi, diikuti Agustus dan Oktober.
-* **Low Performance:** Penurunan signifikan terjadi di bulan **Februari ($5.7K)**. Diperlukan strategi pemasaran khusus (misal: Promo Valentine) untuk mencegah penurunan di periode ini tahun depan.
-
-### 3. Produk Terlaris (Product Mix)
-* **Anchor Product:** **Coffee (3.25K unit)** adalah produk paling dominan.
-* **Health Conscious Customers:** Menariknya, **Salad (3.14K unit)** berada di posisi kedua, mengalahkan *Cake* dan *Juice*. Ini menunjukkan segmen pelanggan kafe ini sangat peduli kesehatan.
-* **Bundling Opportunity:** *Smoothie* berada di posisi terbawah (2.72K). Ada peluang besar untuk membuat paket *bundling* "Healthy Lunch" (Salad + Smoothie) untuk mendongkrak penjualan Smoothie.
-
-### 4. Anomali Sistem Pembayaran
-* Meskipun pembayaran Cash, Credit Card, dan Digital Wallet terdistribusi merata (~1.8K transaksi masing-masing), terdapat **2.56K transaksi (31%)** yang tercatat sebagai "Unknown".
-* **Rekomendasi:** Perlu dilakukan audit pada sistem POS (Point of Sales) atau pelatihan kasir, karena data pembayaran yang hilang ini menghambat rekonsiliasi keuangan yang akurat.
-
----
-
 ## 🛠️ The Process: 5-Phase Cleaning Pipeline (Python)
 
 Tantangan terbesar dataset ini adalah kualitas data yang buruk. Saya menerapkan pendekatan berikut di Python:
@@ -75,28 +50,32 @@ Tantangan terbesar dataset ini adalah kualitas data yang buruk. Saya menerapkan 
 
 ## 📊 Executive Summary & Key Insights
 
-Berdasarkan analisis visual dari dashboard final, berikut adalah temuan strategis utama untuk kinerja bisnis kafe:
+Berdasarkan analisis visual dari dashboard final, berikut adalah rangkuman kinerja bisnis dan temuan strategis utama:
 
-### 1. 📈 Sales Performance & Seasonality
-* **Total Revenue:** Mencapai **$73,000** dengan total **8,159 transaksi**.
+### 1. 🗝️ Key Performance Indicators (KPIs)
+* **Total Revenue:** **$73,000** (Total Omzet)
+* **Total Transactions:** **8,159** (Jumlah Struk)
+* **Average Order Value (AOV):** **$8.9** (Rata-rata belanja per transaksi)
+
+### 2. 📈 Sales Performance & Seasonality
 * **Mid-Year Peak:** Penjualan mencapai puncaknya di bulan **Juni ($6.4K)**, diikuti oleh Agustus dan Oktober. Ini mengindikasikan adanya tren musiman pertengahan tahun yang kuat.
-* **Early Year Slump:** Titik terendah terjadi di bulan **Februari ($5.7K)**.
-    * *Rekomendasi:* Diperlukan strategi promosi khusus (misal: *Valentine's Bundle* atau *Payday Promo*) di bulan Februari dan Mei untuk mencegah penurunan omzet di tahun berikutnya.
+* **Early Year Slump:** Titik terendah terjadi di bulan **Februari ($5.7K)** dan September ($5.9K). Volatilitas bulanan bergerak di kisaran $5.7K - $6.4K.
 
-### 2. ☕ Product Preferences (The "Healthy" Surprise)
-* **Coffee is King:** Seperti yang diprediksi, **Coffee** adalah produk terlaris dengan **3.25K terjual**.
-* **Health-Conscious Customers:** Temuan menarik terlihat pada **Salad (3.14K)** yang menempati posisi kedua, mengalahkan *Cake* dan *Juice*.
-    * *Insight:* Basis pelanggan kafe ini memiliki preferensi kuat terhadap makanan sehat.
-    * *Action:* Stok bahan baku segar untuk Salad harus menjadi prioritas manajemen inventaris.
+### 3. ☕ Product Preferences (The "Healthy" Surprise)
+* **Anchor Product:** Sesuai prediksi, **Coffee** adalah produk terlaris (Dominan) dengan total penjualan **3.25K unit**.
+* **Health-Conscious Customer Base:** Temuan menarik terlihat pada **Salad (3.14K unit)** yang menempati posisi kedua, mengalahkan *Cake* dan *Juice*.
+    * *Insight:* Basis pelanggan kafe ini memiliki preferensi kuat terhadap gaya hidup sehat, bukan sekadar penikmat kopi dan kue.
+    * *Action:* Manajemen inventaris harus memprioritaskan kesegaran bahan baku Salad karena perputarannya sangat cepat.
 
-### 3. 💳 Payment Behavior & Operational Risks
-* **Digital Adoption:** Pembayaran non-tunai (*Digital Wallet* + *Credit Card*) mendominasi hampir 50% dari transaksi yang teridentifikasi.
-* **System Anomaly (Critical):** Terdapat **2.56K transaksi (31%)** dengan metode pembayaran "Unknown".
-    * *Warning:* Angka ini sangat tinggi dan berisiko bagi rekonsiliasi keuangan.
-    * *Action:* Manajemen perlu segera melakukan audit pada sistem POS (*Point of Sales*) atau memberikan pelatihan ulang kepada kasir untuk meminimalisir input data yang kosong.
+### 4. 💳 Payment Behavior & System Anomaly
+* **High Digital Adoption:** Pembayaran non-tunai (*Digital Wallet* + *Credit Card*) mendominasi hampir 50% dari transaksi yang teridentifikasi.
+* **Critical System Anomaly:** Terdapat **2.56K transaksi (31%)** dengan metode pembayaran "Unknown".
+    * *Warning:* Angka ini sangat tinggi dan berisiko menghambat proses rekonsiliasi keuangan (pencocokan kas). Hal ini mengindikasikan masalah pada sistem POS (*Point of Sales*) atau kelalaian input kasir.
 
-### 4. 💡 Strategic Opportunities
-* **Bundling Strategy:** Produk **Smoothie** berada di posisi terendah (2.72K). Ada peluang besar untuk membuat paket *bundling* **"Healthy Lunch Set"** (Salad + Smoothie) untuk mendongkrak penjualan kategori minuman sehat tersebut.
+### 5. 💡 Strategic Recommendations
+1.  **Preventing the Slump:** Luncurkan kampanye pemasaran khusus (misal: *Valentine's Couple Bundle* atau *Payday Promo*) di bulan **Februari** dan **Mei** untuk mencegah penurunan omzet di periode sepi tersebut.
+2.  **Menu Engineering (Bundling):** Produk **Smoothie** berada di posisi penjualan terendah (2.72K). Ada peluang besar untuk membuat paket *bundling* **"Healthy Lunch Set"** (Salad + Smoothie) untuk mendongkrak penjualan kategori minuman tersebut.
+3.  **Operational Audit:** Segera lakukan audit teknis pada mesin kasir (POS) dan berikan pelatihan ulang kepada staf untuk meminimalisir input data pembayaran "Unknown".
 
 ---
 *Connect with me on LinkedIn to discuss more about Data Analysis!*
