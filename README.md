@@ -10,19 +10,30 @@ Project ini bertujuan untuk mengubah data transaksi kafe yang kotor dan tidak te
 * **Pandas & NumPy:** Data Analysis Library
 * **Tableau:** Data Visualization (In Progress)
 
-## 🧹 Data Cleaning Process (Python)
-Data mentah memiliki banyak masalah kualitas. Berikut adalah langkah perbaikan yang saya lakukan:
+## 🧹 Data Cleaning & Recovery Process (Python)
+Saya melakukan proses pembersihan data yang komprehensif dengan pendekatan **5-Phase Pipeline**:
 
-1.  **Handling Wrong Data Types:** Mengubah kolom `Date` yang terbaca string menjadi `Datetime`, dan membersihkan simbol mata uang pada kolom angka (`Quantity`, `Price`, `Total`).
+1.  **Handling Wrong Data Types:** * Mengonversi `Transaction Date` ke format Datetime.
+    * Membersihkan karakter non-numerik ($, ,) pada kolom `Quantity`, `Price`, dan `Total`.
 2.  **Handling Missing Values:**
-    * Mengisi data kategori yang kosong (Location, Payment Method) dengan label "Unknown" untuk menjaga integritas jumlah transaksi.
-    * Menghapus (Drop) data tanggal yang kosong (~4%) karena krusial untuk analisis *Time Series*.
-3.  **Standardizing Labels:**
-    * Memperbaiki format teks (Title Case) agar "coffee" dan "Coffee" dianggap satu produk.
-    * Membersihkan label "Error" menjadi "Unknown".
-4.  **Logic Validation (Quality Assurance):**
-    * Memverifikasi keakuratan matematika: `Quantity` × `Price` = `Total Spent`.
-    * Hasil: Data keuangan valid dan siap divisualisasikan.
+    * Mengisi kekosongan pada kategori (Location, Payment) dengan label "Unknown".
+    * Menghapus data transaksi yang tidak memiliki informasi krusial (Tanggal/Harga).
+3.  **Text Standardization:**
+    * Mengatasi inkonsistensi teks (e.g., "coffee" vs "Coffee") menggunakan Title Casing.
+    * Mengubah label "Error" menjadi "Unknown".
+4.  **🕵️ Advanced Data Recovery (Deductive Imputation):**
+    * **Masalah:** Banyak item berlabel "Unknown" meskipun memiliki harga yang valid.
+    * **Solusi:** Saya mengembangkan algoritma untuk memetakan pola `Harga Unik` ke `Nama Item`.
+    * **Logika:** Jika Harga $X *selalu* merujuk pada Item Y dalam data valid, maka Item "Unknown" dengan harga $X dipastikan adalah Item Y.
+    * **Hasil:** Berhasil memulihkan **~45%** data item yang hilang (Unknown) menjadi data valid, meningkatkan akurasi analisis Best Seller.
+5.  **Validation & Export:**
+    * Memastikan `Quantity` × `Price` = `Total Spent` (Math Check).
+    * **Tableau Compatibility:** Mengekspor data ke format `.xlsx` (Excel) menggunakan library `openpyxl` untuk memastikan format angka dan desimal terbaca sempurna oleh Tableau (mengatasi isu Regional Settings).
+
+## 🛠️ Tech Stack Updated
+* **Python:** Pandas, NumPy
+* **Library Tambahan:** `openpyxl` (untuk export Excel)
+* **Tableau:** Data Visualization
 
 ## 📊 Key Findings (Pre-Visualization)
 Berdasarkan analisis Python awal:

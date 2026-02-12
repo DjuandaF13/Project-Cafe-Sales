@@ -5,7 +5,7 @@ Author      : Fachriza Djuanda
 Date        : 2026
 Description : Skrip ini bertujuan untuk membersihkan 'Dirty Data' transaksi kafe
               menjadi data yang siap untuk visualisasi (Tableau).
-Steps       : Data Loading -> Audit -> Cleaning -> Validation -> Export.
+Steps       : Data Loading -> Audit -> Cleaning -> Advanced Recovery -> Export.
 """
 
 import pandas as pd
@@ -14,154 +14,157 @@ import numpy as np
 # ==============================================================================
 # PHASE 1: DATA LOADING & INITIAL ASSESSMENT
 # ==============================================================================
+print("--- 1. INITIAL DATA INSPECTION ---")
 
 # 1.1 Load Data
-# Pastikan path file menggunakan raw string (r"...") agar backslash terbaca benar
+# Menggunakan raw string (r"...") untuk path file windows
 file_path = r"D:\Project\Data Analyst\Project Cafe Sales\dirty_cafe_sales.csv"
 data = pd.read_csv(file_path)
 
-print("--- 1. INITIAL DATA INSPECTION ---")
-# Melihat sampel data teratas untuk gambaran awal struktur tabel
-print("HEAD:\n", data.head())
-
-# Mengecek tipe data dan keberadaan nilai null (Info)
-print("\nINFO:")
+# 1.2 Audit Awal
+print("HEAD (Sampel Data):\n", data.head())
+print("\nINFO (Tipe Data & Null):")
 print(data.info())
-
-# Melihat anomali statistik (misal: nilai negatif, outlier ekstrem)
-print("\nSTATISTIK DESKRIPTIF:")
+print("\nSTATISTIK DESKRIPTIF (Cek Anomali):")
 print(data.describe(include="all"))
-
-# Mengecek total missing values per kolom
 print("\nMISSING VALUES AWAL:")
 print(data.isnull().sum())
-
-# Mengecek apakah ada baris yang duplikat total
 print(f"\nDUPLIKASI DATA: {data.duplicated().sum()}")
 
 
 # ==============================================================================
-# PHASE 2: DATA CLEANING & PREPROCESSING
+# PHASE 2: BASIC DATA CLEANING & PREPROCESSING
 # ==============================================================================
 print("\n--- 2. STARTING DATA CLEANING ---")
 
-# Membuat copy agar data asli (raw data) tetap aman
+# Buat copy agar data asli aman
 df_clean = data.copy()
 
-# 2.1 Standardisasi Nama Kolom
-# Mengubah format menjadi snake_case (huruf kecil & underscore) agar konsisten
+# 2.1 Standardisasi Nama Kolom (Snake Case)
 df_clean.columns = df_clean.columns.str.replace(" ", "_").str.lower()
 print(f"Column Names Updated: {df_clean.columns}")
 
-# 2.2 Membersihkan Kolom Numerik (Quantity, Price, Total Spent)
-# Masalah: Data terdeteksi sebagai Object karena ada simbol '$' dan ','
+# 2.2 Membersihkan Kolom Numerik
+# Menghapus simbol '$' dan ',' lalu convert ke Float/Int
 nums_cols = ["quantity", "price_per_unit", "total_spent"]
-
 for col in nums_cols:
     df_clean[col] = pd.to_numeric(
         df_clean[col].astype(str).str.replace("$", "").str.replace(",", ""),
-        errors="coerce",  # Mengubah text error menjadi NaN
+        errors="coerce",  # Ubah text error jadi NaN
     )
 
-print("\nCek Tipe Data Setelah Cleaning Numerik:")
-print(df_clean.info())
-
 # 2.3 Membersihkan Kolom Tanggal
-# Mengubah ke format datetime agar bisa dilakukan analisis Time Series
 df_clean["transaction_date"] = pd.to_datetime(
     df_clean["transaction_date"], errors="coerce"
 )
 
-# 2.4 Handling Missing Values (Strategi Penanganan)
-# -> Strategi Kategori: Isi dengan "Unknown" agar data transaksi tetap terekam
+# 2.4 Handling Missing Values (Basic Strategy)
+# -> Kategori: Isi dengan "Unknown"
 cat_cols = ["payment_method", "location", "item"]
 for col in cat_cols:
     df_clean[col] = df_clean[col].fillna("Unknown")
 
-# -> Strategi Numerik & Tanggal: Hapus (Drop)
-# Alasan: Data tanpa Harga, Jumlah, atau Tanggal tidak valid untuk analisis penjualan
+# -> Numerik & Tanggal: Drop (Hapus) baris yang kosong
 cols_critical = ["quantity", "price_per_unit", "total_spent", "transaction_date"]
 df_clean = df_clean.dropna(subset=cols_critical)
 
-# 2.5 Finalisasi Struktur Tabel
-# Reset index agar urutan baris kembali rapi setelah penghapusan
+# 2.5 Finalisasi Index
 df_clean = df_clean.reset_index(drop=True)
 
-print(f"\nSisa Data Valid: {df_clean.shape[0]} baris")
-print("Sisa Null Values:", df_clean.isnull().sum().sum())
+print(f"\nSisa Data Valid setelah Basic Cleaning: {df_clean.shape[0]} baris")
 
 
 # ==============================================================================
-# PHASE 3: TEXT STANDARDIZATION & ERROR HANDLING
+# PHASE 3: TEXT STANDARDIZATION
 # ==============================================================================
 print("\n--- 3. TEXT HANDLING ---")
 
-# 3.1 Standardisasi Text (Title Case)
-# Mengatasi duplikasi implisit (e.g., "coffee" vs "Coffee")
+# 3.1 Title Casing (Agar 'coffee' == 'Coffee')
 text_cols = ["item", "payment_method", "location"]
 for col in text_cols:
     df_clean[col] = df_clean[col].str.title()
 
-# 3.2 Label Correction
-# Mengganti label "Error" atau variannya menjadi "Unknown"
+# 3.2 Label Correction (Error -> Unknown)
 for col in text_cols:
     df_clean[col] = df_clean[col].replace(
         ["Error", "ERROR", "Unknown", "unknown"], "Unknown"
     )
 
-# 3.3 Verifikasi Nilai Unik
-# Memastikan tidak ada lagi label aneh yang tersisa
-print("\nCheck Unique Values (Final):")
-for col in text_cols:
-    print(f"[{col.upper()}]:\n{df_clean[col].value_counts(dropna=False)}")
-    print("-" * 15)
+print("Text Standardization Complete.")
 
 
 # ==============================================================================
-# PHASE 4: LOGIC VALIDATION (QUALITY ASSURANCE)
+# PHASE 4: ADVANCED VALIDATION & DATA RECOVERY
 # ==============================================================================
-print("\n--- 4. DATA VALIDATION ---")
+print("\n--- 4. ADVANCED VALIDATION & RECOVERY ---")
 
-# 4.1 Math Check: Verifikasi Konsistensi Data
-# Rumus: Quantity * Price == Total Spent
+# 4.1 Math Check (Validasi Logika)
+# Rumus: Quantity * Price harus sama dengan Total Spent
 df_clean["calculated_total"] = df_clean["quantity"] * df_clean["price_per_unit"]
-
-# Toleransi selisih 0.01 untuk menghindari floating point error
 mask_salah_hitung = abs(df_clean["total_spent"] - df_clean["calculated_total"]) > 0.01
 jumlah_salah = mask_salah_hitung.sum()
 
-print(f"Jumlah Transaksi dengan Perhitungan Salah: {jumlah_salah}")
+print(f"Validasi Matematika - Jumlah Transaksi Salah Hitung: {jumlah_salah}")
 
-if jumlah_salah > 0:
-    print("Contoh Data Salah:\n", df_clean[mask_salah_hitung].head())
-
-# 4.2 Cleanup Helper Column
+# Cleanup kolom bantuan
 if "calculated_total" in df_clean.columns:
     df_clean = df_clean.drop(columns=["calculated_total"])
+
+# 4.2 Deductive Imputation (Misi Penyelamatan Data Unknown)
+# Logika: Jika Harga $X selalu merujuk pada Item Y, maka Item Unknown dengan Harga $X pasti Item Y.
+
+print("\n--- MENJALANKAN MISI PENYELAMATAN DATA ---")
+# Buat Peta Harga dari data yang valid
+price_map = (
+    df_clean[df_clean["item"] != "Unknown"].groupby("price_per_unit")["item"].unique()
+)
+mapping_dict = {}
+
+for price, items in price_map.items():
+    if len(items) == 1:
+        # HOKI! 1 Harga = 1 Item
+        mapping_dict[price] = items[0]
+
+# Eksekusi Pengisian Unknown
+unknown_awal = (df_clean["item"] == "Unknown").sum()
+
+
+def fill_unknown_items(row):
+    if row["item"] == "Unknown" and row["price_per_unit"] in mapping_dict:
+        return mapping_dict[row["price_per_unit"]]
+    return row["item"]
+
+
+df_clean["item"] = df_clean.apply(fill_unknown_items, axis=1)
+unknown_akhir = (df_clean["item"] == "Unknown").sum()
+
+print(f"Item 'Unknown' Awal  : {unknown_awal}")
+print(f"Item 'Unknown' Akhir : {unknown_akhir}")
+print(f"✅ Data Berhasil Diselamatkan : {unknown_awal - unknown_akhir} baris")
 
 
 # ==============================================================================
 # PHASE 5: FINAL INSIGHTS & EXPORT
 # ==============================================================================
-print("\n--- 5. FINAL REPORT ---")
+print("\n--- 5. FINAL REPORT & EXPORT ---")
 
-# 5.1 Quick Insights (Sanity Check)
+# 5.1 Quick Insights
 total_revenue = df_clean["total_spent"].sum()
 print(f"Total Revenue: ${total_revenue:,.2f}")
 
-print("\nTop 5 Items by Quantity:")
+print("\nTop 5 Items by Quantity (Final):")
 print(df_clean.groupby("item")["quantity"].sum().sort_values(ascending=False).head(5))
 
-print("\nAverage Spend per Payment Method:")
-print(df_clean.groupby("payment_method")["total_spent"].mean())
+# 5.2 Export Data (CSV & Excel)
+# Export CSV
+csv_filename = "cafe_sales_clean.csv"
+df_clean.to_csv(csv_filename, index=False)
+print(f"\n✅ CSV Saved: '{csv_filename}'")
 
-# 5.2 Export Data
-output_filename = "cafe_sales_clean.csv"
-df_clean.to_csv(output_filename, index=False)
-print(
-    f"\n✅ SUCCESS: File '{output_filename}' berhasil disimpan dan siap untuk visualisasi."
-)
+# Export Excel (Recommended for Tableau to fix decimal issues)
+xlsx_filename = "cafe_sales_final.xlsx"
+df_clean.to_excel(xlsx_filename, index=False)
+print(f"✅ Excel Saved: '{xlsx_filename}' (Gunakan file ini untuk Tableau)")
 
-# Tampilkan sampel data akhir
 print("\nSample Data Akhir:")
 print(df_clean.head(10))
