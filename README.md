@@ -1,6 +1,6 @@
 # ☕ Cafe Sales Analytics: From Dirty Data to Actionable Insights
 
-![Dashboard Preview](assets/dashboard_final.png)
+![Dashboard Preview](assets/Dashboard.png)
 
 ## 📌 Project Overview
 Project ini bertujuan untuk mengubah data transaksi kafe yang kotor dan tidak terstruktur menjadi **dashboard interaktif** yang memberikan wawasan strategis bagi pemilik bisnis. 
