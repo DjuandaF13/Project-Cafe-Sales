@@ -1,6 +1,5 @@
 """
 PROJECT: CAFE SALES DATA CLEANING & ANALYSIS
----------------------------------------------
 Author      : Fachriza Djuanda
 Date        : 2026
 Description : Skrip ini bertujuan untuk membersihkan 'Dirty Data' transaksi kafe
@@ -130,11 +129,11 @@ print(df_clean.groupby("item")["quantity"].sum().sort_values(ascending=False).he
 # Export CSV
 csv_filename = "cafe_sales_clean.csv"
 df_clean.to_csv(csv_filename, index=False)
-print(f"\n✅ CSV Saved: '{csv_filename}'")
+print(f"\n CSV Saved: '{csv_filename}'")
 # Export Excel
 xlsx_filename = "cafe_sales_final.xlsx"
 df_clean.to_excel(xlsx_filename, index=False)
-print(f"✅ Excel Saved: '{xlsx_filename}' (Gunakan file ini untuk Tableau)")
+print(f"Excel Saved: '{xlsx_filename}' (Gunakan file ini untuk Tableau)")
 
 print("\nSample Data Akhir:")
 print(df_clean.head(10))
